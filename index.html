@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#2f55d4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tiny Start">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="icon" href="/icon-192.png">
+<title>Tiny Start – study help</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f4f6fb;--fg:#1b2233;--card:#fff;--accent:#2f55d4;--accent-fg:#fff;--soft:#e8eeff;--muted:#586075;--line:#d5dae8;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);font-size:18px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151f;--fg:#e9ecf4;--card:#1a2030;--accent:#7b9bff;--accent-fg:#0d1220;--soft:#232c47;--muted:#a3abbd;--line:#2c3550}}
+:root[data-theme="dark"]{--bg:#11151f;--fg:#e9ecf4;--card:#1a2030;--accent:#7b9bff;--accent-fg:#0d1220;--soft:#232c47;--muted:#a3abbd;--line:#2c3550}
+body.hc{--bg:#000;--fg:#fff;--card:#000;--accent:#ffe600;--accent-fg:#000;--soft:#222;--muted:#fff;--line:#fff}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+body.dys{font-family:Verdana,Tahoma,"Trebuchet MS",sans-serif;letter-spacing:.05em;word-spacing:.15em;line-height:1.8}
+main{max-width:600px;margin:0 auto;padding:16px 16px 100px}
+h1{margin:.1em 0 0;font-size:1.6rem}h2{font-size:1.15rem;margin:0 0 .6em}
+.top p{margin:0 0 .6em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.muted{color:var(--muted)}
+button,select,input[type=text]{font:inherit;color:var(--fg);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;min-height:46px}
+select,input[type=text],textarea{width:100%}
+textarea{font:inherit;color:var(--fg);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;margin:6px 0}
+h3{font-size:1rem;margin:14px 0 4px}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
+button.big{width:100%;font-size:1.1rem;min-height:54px;margin-top:6px}
+button[aria-pressed=true]{border-color:var(--accent);background:var(--soft);font-weight:700}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:1.8rem;padding:14px 8px}
+.choice span{font-size:.85rem;text-align:center}
+.field{margin:14px 0 0}.field label{display:block;font-weight:600;margin-bottom:4px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.tabs button{font-size:.85rem;padding:8px 4px}
+.tabs button[aria-selected=true]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
+ol{list-style:none;padding:0;margin:0}
+li.step{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+li.step:first-child{border-top:0}
+li.step input{width:26px;height:26px;margin-top:4px;accent-color:var(--accent);flex:none}
+li.done .t{text-decoration:line-through;opacity:.6}
+.t b{display:block}
+.coach{display:none;margin-top:6px;padding:8px 10px;border-left:4px solid var(--accent);background:var(--soft);border-radius:6px}
+body.par .coach{display:block}
+#clock{font-size:3.4rem;font-weight:700;font-variant-numeric:tabular-nums;text-align:center;margin:.2em 0}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar div{height:100%;width:0;background:var(--accent)}
+details{border-top:1px solid var(--line);padding:10px 0}
+summary{cursor:pointer;font-weight:600}
+ul{padding-left:1.2em}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.nav button{flex:1;border:0;border-radius:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:0;font-size:.75rem;padding:6px 0;min-height:58px}
+.nav button i{font-style:normal;font-size:1.4rem}
+.nav button[aria-current=page]{color:var(--accent);font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><h1>Tiny Start</h1><p class="muted">Small steps. Big progress.</p></header>
+
+<section id="viewStudy">
+<div id="setup" class="card">
+<h2>Who’s studying today?</h2>
+<div class="two">
+<button class="choice" id="modeS" aria-pressed="true">🎓<span>I’m studying</span></button>
+<button class="choice" id="modeP" aria-pressed="false">👪<span>I’m helping my child</span></button>
+</div>
+<div class="field" id="ageRow" hidden><label for="age">Your child’s age</label><select id="age"><option value="young">5–7</option><option value="mid" selected>8–11</option><option value="old">12+</option></select></div>
+<div class="field"><label for="topic">What needs studying?</label><input type="text" id="topic" maxlength="100" placeholder="e.g. Chapter 4 biology"></div>
+<div class="field" id="levelWrap"><label for="level">Your grade</label><select id="level"><option>Grades 6–8</option><option selected>Grades 9–10</option><option>Grades 11–12</option></select></div>
+<div class="field"><label for="mins">How much time do you have?</label><select id="mins"><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="25">25 minutes</option></select></div>
+<button class="primary big" id="make">Let’s go →</button>
+<p class="muted" id="hint">Not sure where to begin? Type any subject. No sign-up needed.</p>
+</div>
+
+<div id="work" hidden>
+<button id="back">← New topic</button>
+<div class="tabs" role="tablist">
+<button role="tab" id="tab0" aria-selected="true">1 · Steps</button>
+<button role="tab" id="tab1" aria-selected="false">2 · Timer</button>
+<button role="tab" id="tab2" aria-selected="false">3 · Learn</button>
+</div>
+<section class="card" id="plan">
+<h2>Do one small step at a time</h2>
+<div class="bar" aria-hidden="true"><div id="prog"></div></div>
+<p class="muted" id="count"></p>
+<ol id="steps"></ol>
+<button class="primary big" id="nx0">Start the timer →</button>
+</section>
+<section class="card" id="timerCard" hidden>
+<h2>Focus for a few minutes</h2>
+<div id="clock" role="timer" aria-live="off">05:00</div>
+<div class="row" style="justify-content:center">
+<button class="primary" id="go">Start</button>
+<button id="reset">Reset</button>
+</div>
+<p class="muted" id="msg" role="status" style="text-align:center"></p>
+<button class="primary big" id="nx1">Learn and quiz →</button>
+</section>
+<section class="card" id="learn" hidden>
+<h2>Learn it, then test yourself</h2>
+<h3>From your own notes (free, unlimited)</h3>
+<textarea id="notes" rows="5" maxlength="3000" placeholder="Paste your notes here. Tip: write each flashcard on its own line like “term: meaning”."></textarea>
+<div class="row"><button class="primary" id="mkBlank">Fill-in-the-blank quiz</button><button id="mkCards">Flashcards</button></div>
+<h3>AI help</h3>
+<p class="muted" id="left"></p>
+<p class="muted">AI can make mistakes, so check important things with a teacher or textbook.</p>
+<div class="row"><button class="primary" id="explain">Explain it simply</button><button id="quiz">Practice questions</button></div>
+<p class="muted" id="ai" role="status"></p>
+<div id="out" style="white-space:pre-wrap"></div>
+<div id="qs"></div>
+</section>
+</div>
+</section>
+
+<section id="viewProgress" hidden>
+<h2>Your progress</h2>
+<p class="muted" id="days"></p>
+<div class="card" id="histCard">
+<p class="muted" id="avg"></p>
+<p id="emptyHist">No quizzes yet. Finish a practice quiz and your scores will show up here.</p>
+<ul id="hist"></ul>
+<p class="muted">Saved on this device only.</p>
+<button id="clearHist">Clear history</button>
+</div>
+</section>
+
+<section id="viewHelp" hidden>
+<h2>Help</h2>
+<div class="card">
+<h2>How it works</h2>
+<ol style="list-style:decimal;padding-left:1.2em">
+<li>Pick who’s studying and type a topic.</li>
+<li>Follow the small steps. Tick each one off.</li>
+<li>Run the timer, then get an explanation and practice questions.</li>
+</ol>
+</div>
+<div class="card">
+<details><summary>For parents</summary><p>Choose “I’m helping my child.” Each step then shows a tip on how to guide them. Sit beside them, let them teach it back to you, and praise effort over right answers.</p></details>
+<details><summary>No quiet place?</summary><p>Try headphones with soft background sound, a library or school room, or a corner with your back to the room. Even 5 minutes with your phone out of reach counts.</p></details>
+<details><summary>No device, notes, or books?</summary><p>Study from memory: say aloud what you remember, write it on any paper, then check it against class notes later. Ask a classmate to share photos of notes.</p></details>
+<details><summary>Feeling overwhelmed?</summary><p>Pick the smallest step and ignore the rest. Finishing one step is a win. If this feels bigger than stress, talk to a teacher, counselor, or someone you trust.</p></details>
+<details><summary>Reading or focus is hard?</summary><p>Turn on the easy-read font and bigger text in Settings. Break text into short chunks, use a ruler under the line, and ask your school about learning support.</p></details>
+</div>
+</section>
+
+<section id="viewSettings" hidden>
+<h2>Settings</h2>
+<div class="card">
+<h2>Make it comfortable</h2>
+<div class="row">
+<button id="smaller" aria-label="Smaller text">A−</button>
+<button id="bigger" aria-label="Larger text">A+</button>
+<button id="dys" aria-pressed="false">Easy-read font</button>
+<button id="hc" aria-pressed="false">High contrast</button>
+</div>
+</div>
+<div class="card">
+<h2>Daily limit</h2>
+<div class="field"><label for="lim">AI helps per day</label><select id="lim"><option value="3">3</option><option value="5">5</option><option value="10">10</option></select></div>
+<p class="muted">One “AI help” is one explanation or one set of practice questions. Notes tools are unlimited. A parent or teacher can set this. It resets every day.</p>
+</div>
+</section>
+</main>
+
+<nav class="nav" aria-label="Main">
+<button id="navStudy" aria-current="page"><i>📚</i>Study</button>
+<button id="navProgress"><i>📈</i>Progress</button>
+<button id="navHelp"><i>💡</i>Help</button>
+<button id="navSettings"><i>⚙️</i>Settings</button>
+</nav>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var S={size:18,dys:false,hc:false,days:[],par:false,age:'mid',hist:[],ai:{d:'',n:0},lim:5,did:''};
+try{var raw=localStorage.getItem('tinystart');if(raw){S=Object.assign(S,JSON.parse(raw))}}catch(e){}
+function save(){
+try{localStorage.setItem('tinystart',JSON.stringify(S))}catch(e){}
+try{
+var T=window.Telegram&&Telegram.WebApp;
+if(T&&T.initData&&T.CloudStorage){
+var c={size:S.size,dys:S.dys,hc:S.hc,par:S.par,age:S.age,hist:S.hist.slice(-15),days:S.days.slice(-60),ai:S.ai,lim:S.lim};
+var v=JSON.stringify(c);
+if(v.length>3900){c.days=c.days.slice(-20);c.hist=c.hist.slice(-8);v=JSON.stringify(c)}
+T.CloudStorage.setItem('tinystart',v,function(){})}
+}catch(e){}
+}
+function applyLook(){
+document.documentElement.style.fontSize=S.size+'px';
+document.body.classList.toggle('dys',S.dys);
+document.body.classList.toggle('hc',S.hc);
+$('#dys').setAttribute('aria-pressed',S.dys);
+$('#hc').setAttribute('aria-pressed',S.hc);
+document.body.classList.toggle('par',S.par);
+$('#modeS').setAttribute('aria-pressed',!S.par);
+$('#modeP').setAttribute('aria-pressed',S.par);
+$('#ageRow').hidden=!S.par;
+$('#age').value=S.age;
+$('#topic').placeholder=S.par?'e.g. Adding fractions with my child':'e.g. Chapter 4 biology';
+$('#levelWrap').hidden=S.par;
+showHist();showLeft();$('#lim').value=String(S.lim||5);
+$('#days').textContent=S.days.length?('Days you’ve shown up: '+S.days.length+'. That matters.'):'';
+}
+$('#smaller').onclick=function(){S.size=Math.max(14,S.size-2);applyLook();save()};
+$('#bigger').onclick=function(){S.size=Math.min(28,S.size+2);applyLook();save()};
+$('#dys').onclick=function(){S.dys=!S.dys;applyLook();save()};
+$('#hc').onclick=function(){S.hc=!S.hc;applyLook();save()};
+
+var ALL=[
+['Get ready (1 min)','Open your notes or book to the right page. Nothing else yet.'],
+['Skim (2 min)','Look only at headings and bold words. No need to understand yet.'],
+['Learn one small piece','Pick the first heading. Read just that part, slowly.'],
+['Write 3 things from memory','Close the book. Write or say three things you remember.'],
+['Test yourself','Ask yourself one question about it and answer out loud.'],
+['Stop and park the next step','Write one sentence: what you’ll do next time.']
+];
+var PICK={5:[0,2,3,5],10:[0,1,2,3,5],25:[0,1,2,3,4,5]};
+var COACH=[
+'Sit beside them. Let them fetch the book or paper themselves.',
+'Ask: “What do you think this is about?” Let them guess before reading.',
+'Read this part aloud together, or listen while they read. Pause for questions.',
+'Ask them to teach it back to you as if you were the student. Praise effort, not just right answers.',
+'Ask one question. If they’re wrong, say “Let’s look again together,” not “No.”',
+'Celebrate the effort. Agree together on tomorrow’s tiny step.'
+];
+var total=300,left=300,tid=null,steps=[];
+
+function fmt(n){var m=Math.floor(n/60),s=n%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s}
+function updateProg(){
+var d=document.querySelectorAll('#steps input:checked').length;
+$('#prog').style.width=(steps.length?d/steps.length*100:0)+'%';
+$('#count').textContent=d+' of '+steps.length+' done'+(d===steps.length&&d?' – great work!':'');
+}
+function markToday(){
+var t=new Date().toISOString().slice(0,10);
+if(S.days.indexOf(t)<0){S.days.push(t);save();applyLook()}
+}
+$('#make').onclick=function(){
+var topic=$('#topic').value.trim();
+if(!topic){$('#hint').textContent='Type any subject first. Even just “maths”.';$('#topic').focus();return}
+var mins=parseInt($('#mins').value,10);
+var cap=S.age==='young'?5:(S.age==='mid'?10:25);
+if(S.par&&mins>cap){mins=cap;$('#mins').value=String(cap)}
+steps=PICK[mins].map(function(i){return ALL[i].concat([COACH[i]])});
+var ol=$('#steps');ol.textContent='';
+steps.forEach(function(st,i){
+var li=document.createElement('li');li.className='step';
+var cb=document.createElement('input');cb.type='checkbox';cb.id='s'+i;
+var lab=document.createElement('label');lab.htmlFor=cb.id;lab.className='t';
+var b=document.createElement('b');b.textContent=st[0];
+var p=document.createElement('span');p.textContent=(i===0?st[1]+' (Topic: '+topic+')':st[1]);
+var c=document.createElement('div');c.className='coach';c.textContent='Parent tip: '+st[2];
+lab.appendChild(b);lab.appendChild(p);lab.appendChild(c);
+cb.onchange=function(){li.classList.toggle('done',cb.checked);if(cb.checked)markToday();updateProg()};
+li.appendChild(cb);li.appendChild(lab);ol.appendChild(li);
+});
+total=left=mins*60;$('#clock').textContent=fmt(left);
+clearInterval(tid);tid=null;$('#go').textContent='Start';$('#msg').textContent='';
+$('#out').textContent='';$('#qs').textContent='';$('#ai').textContent='';
+updateProg();showWork();
+};
+$('#go').onclick=function(){
+if(tid){clearInterval(tid);tid=null;this.textContent='Resume';return}
+this.textContent='Pause';$('#msg').textContent='Just this one step. You’ve got this.';
+var endAt=Date.now()+left*1000;
+tid=setInterval(function(){
+left=Math.max(0,Math.round((endAt-Date.now())/1000));$('#clock').textContent=fmt(Math.max(left,0));
+if(left<=0){clearInterval(tid);tid=null;$('#go').textContent='Start';markToday();
+$('#msg').textContent='Time’s up. You showed up, and that counts. Take a break!'}
+},1000);
+};
+$('#reset').onclick=function(){clearInterval(tid);tid=null;left=total;$('#clock').textContent=fmt(left);$('#go').textContent='Start';$('#msg').textContent=''};
+function showHist(){
+var c=$('#histCard'),ul=$('#hist');
+ul.textContent='';$('#emptyHist').hidden=!!(S.hist&&S.hist.length);$('#avg').textContent='';if(!S.hist||!S.hist.length){return}
+S.hist.slice(-10).reverse().forEach(function(h){
+var li=document.createElement('li');
+li.textContent=h.d+' – '+h.t+': '+h.s+'/'+h.n;ul.appendChild(li)});
+var tot=0,n=0;S.hist.forEach(function(h){tot+=h.s;n+=h.n});
+$('#avg').textContent='Overall: '+Math.round(tot/n*100)+'% correct across '+S.hist.length+' quizzes';
+}
+$('#clearHist').onclick=function(){S.hist=[];save();showHist()};
+var STOP='about above after again also because before being between both could does during each from have into just like made make many more most much must only other over same should some such than that their them then there these they this those through under very want were what when where which while will with would your'.split(' ');
+function words(s){return s.match(/[A-Za-z0-9][A-Za-z0-9’'-]*/g)||[]}
+function cands(s){return words(s).filter(function(x){return x.length>=5&&STOP.indexOf(x.toLowerCase())<0})}
+function best(s){var b=null,bs=-1;words(s).forEach(function(x,i){if(x.length<5||STOP.indexOf(x.toLowerCase())>=0)return;var sc=x.length+(/\d/.test(x)?3:0)+((i>0&&/^[A-Z]/.test(x))?3:0);if(sc>bs){bs=sc;b=x}});return b}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function sentencesOf(t){return t.replace(/\s+/g,' ').replace(/([.!?])\s+/g,'$1\u0001').split('\u0001').map(function(x){return x.trim()}).filter(function(x){return x.split(' ').length>=6})}
+function makeBlanks(text){
+var ss=sentencesOf(text).slice(0,12),all=[],items=[];
+ss.forEach(function(s){cands(s).forEach(function(w){if(all.indexOf(w)<0)all.push(w)})});
+ss.slice(0,8).forEach(function(s){
+var k=best(s);if(!k)return;
+var dis=shuffle(all.filter(function(w){return w.toLowerCase()!==k.toLowerCase()})).slice(0,3);
+if(dis.length<3)return;
+var opts=shuffle([k].concat(dis));
+items.push({q:s.replace(k,'_____'),options:opts,answer:opts.indexOf(k),why:'The sentence reads: '+s});
+});
+return items;
+}
+function parseCards(text){
+var cards=[];
+text.split(/\n+/).forEach(function(l){var m=l.match(/^\s*(.{2,80}?)\s*(?::|=|–|—| - )\s*(.{3,300})$/);if(m)cards.push([m[1],m[2]])});
+return cards;
+}
+
+function today(){return new Date().toISOString().slice(0,10)}
+function left(){return Math.max(0,(S.lim||5)-((S.ai&&S.ai.d===today())?S.ai.n:0))}
+function showLeft(){$('#left').textContent=left()+' of '+(S.lim||5)+' AI helps left today'}
+function canUse(){
+if(left()<1){$('#ai').textContent='You’ve used today’s '+(S.lim||5)+' AI helps. Notes questions are still unlimited. Come back tomorrow!';return false}
+$('#explain').disabled=true;$('#quiz').disabled=true;return true;
+}
+function done(){$('#explain').disabled=false;$('#quiz').disabled=false}
+function useOne(){var t=today();if(!S.ai||S.ai.d!==t)S.ai={d:t,n:0};S.ai.n++;save();showLeft();done()}
+$('#lim').onchange=function(){S.lim=parseInt(this.value,10);save();showLeft()};
+$('#mkBlank').onclick=function(){
+var t=$('#notes').value.trim();
+if(t.length<60){$('#ai').textContent='Paste a few sentences of notes first.';return}
+var items=makeBlanks(t);
+if(!items.length){$('#ai').textContent='I need a few more full sentences to make questions. Add more notes.';return}
+$('#out').textContent='';renderQuiz(items);$('#ai').textContent='Pick the word that fits each blank.';
+};
+$('#mkCards').onclick=function(){
+var cards=parseCards($('#notes').value);
+if(cards.length<2){$('#ai').textContent='Write each card on its own line like “term: meaning”. You need at least 2 lines.';return}
+$('#out').textContent='';$('#ai').textContent='';runCards(shuffle(cards).slice(0,20));
+};
+function runCards(cards){
+var box=$('#qs');box.textContent='';var i=0,known=0,tp=$('#topic').value.trim().slice(0,60);
+var card=document.createElement('div');card.className='card';
+var st=document.createElement('p');st.className='muted';st.setAttribute('role','status');
+var q=document.createElement('p');q.style.fontWeight='600';q.style.fontSize='1.2rem';
+var a=document.createElement('p');
+var show=document.createElement('button');show.textContent='Show answer';
+var row=document.createElement('div');row.className='row';
+var yes=document.createElement('button');yes.className='primary';yes.textContent='I knew it';
+var no=document.createElement('button');no.textContent='Not yet';
+row.appendChild(yes);row.appendChild(no);
+[st,q,a,show,row].forEach(function(e){card.appendChild(e)});box.appendChild(card);
+function draw(){
+if(i>=cards.length){
+card.textContent='';var p=document.createElement('p');p.textContent='Done! You knew '+known+' of '+cards.length+'.';card.appendChild(p);
+S.hist.push({d:today(),t:(tp||'Flashcards')+' (cards)',s:known,n:cards.length});S.hist=S.hist.slice(-30);save();showHist();markToday();return}
+st.textContent='Card '+(i+1)+' of '+cards.length;q.textContent=cards[i][0];a.textContent=cards[i][1];a.hidden=true;row.hidden=true;show.hidden=false}
+show.onclick=function(){a.hidden=false;row.hidden=false;show.hidden=true};
+yes.onclick=function(){known++;i++;draw()};
+no.onclick=function(){i++;draw()};
+draw();
+}
+async function ask(input,json,onText){
+var r;
+try{r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:input,did:S.did})})}catch(e){throw {code:'none'}}
+if(r.status===429){var j={};try{j=await r.json()}catch(e){}throw {code:j.error==='daily_limit'?'daily':'rate_limited'}}
+if(r.status===404||r.status===405||r.status===500)throw {code:'none'};
+if(!r.ok)throw {code:'bad'};
+var d=await r.json();
+if(json){try{var tx=String(d.text);var a=tx.indexOf('['),b=tx.lastIndexOf(']');if(a>=0&&b>a)tx=tx.slice(a,b+1);return JSON.parse(tx)}catch(e){throw {code:'bad'}}}
+return {text:d.text};
+}
+function who(){
+if(S.par){var a={young:'5 to 7',mid:'8 to 11',old:'12 and up'}[S.age];
+return 'a parent teaching a child aged '+a+'. Write so the parent can say it aloud, and finish with two questions the parent can ask the child.'}
+return 'a teenager at this level: '+$('#level').value+'.'
+}
+function fail(e){
+done();var c=e&&e.code;
+if(c==='daily'){$('#ai').textContent='The daily AI limit has been reached. Notes questions are still unlimited. Come back tomorrow!';return}
+$('#ai').textContent=(c==='none'||c==='not_granted')?'AI help isn’t switched on yet. The steps and timer still work.':(c==='rate_limited'?'Too many requests. Wait a minute and try again.':'Something went wrong. Please try again.');
+}
+function topicOr(){var t=$('#topic').value.trim();if(!t)$('#ai').textContent='Type a topic first.';return t}
+$('#explain').onclick=async function(){
+var t=topicOr();if(!t)return;if(!canUse())return;
+$('#ai').textContent='Thinking…';$('#out').textContent='';
+try{
+var r=await ask('You are a kind, clear tutor. Explain the topic "'+t+'" for '+who()+' Use short paragraphs, one everyday example, and a 3-line recap. Plain text only, no markdown symbols. Under 250 words. Be accurate and say so if unsure.',false,function(x){$('#out').textContent=x.text});
+$('#out').textContent=r.text;$('#ai').textContent='AI can make mistakes. Check important facts with your teacher or textbook.';markToday();useOne();
+}catch(e){fail(e)}
+};
+$('#quiz').onclick=async function(){
+var t=topicOr();if(!t)return;if(!canUse())return;
+$('#ai').textContent='Making questions…';$('#qs').textContent='';
+try{
+var r=await ask('Write 5 multiple-choice practice questions on "'+t+'" for '+who()+' Return only JSON: an array of 5 objects, each {"q":string,"options":[4 strings],"answer":number 0-3,"why":one short sentence}. Make them accurate.',true);
+var list=Array.isArray(r)?r:((r&&r.questions)||[]);
+if(!list.length)throw {code:'bad'};
+renderQuiz(list);useOne();$('#ai').textContent='Pick an answer for each question. AI can make mistakes, so double-check with your teacher.';
+}catch(e){fail(e)}
+};
+function renderQuiz(list){
+var box=$('#qs');box.textContent='';var score=0,answered=0;var tp=$('#topic').value.trim().slice(0,60);
+var sc=document.createElement('p');sc.setAttribute('role','status');sc.className='muted';box.appendChild(sc);
+list.forEach(function(it,qi){
+var d=document.createElement('div');d.className='card';
+var p=document.createElement('p');p.style.fontWeight='600';p.textContent=(qi+1)+'. '+it.q;d.appendChild(p);
+var why=document.createElement('p');why.className='muted';why.hidden=true;
+var btns=[];
+(it.options||[]).forEach(function(o,oi){
+var b=document.createElement('button');b.style.display='block';b.style.width='100%';b.style.textAlign='left';b.style.marginTop='6px';b.textContent=o;
+b.onclick=function(){
+btns.forEach(function(x){x.disabled=true});
+var ok=oi===it.answer;
+if(ok)score++;
+answered++;
+b.textContent=(ok?'✓ ':'✗ ')+o;
+if(!ok&&btns[it.answer])btns[it.answer].textContent='✓ '+btns[it.answer].textContent;
+why.textContent=(ok?'Nice! ':'Not quite. ')+(it.why||'');why.hidden=false;
+sc.textContent='Score: '+score+' / '+answered+' answered';
+if(answered===list.length){S.hist.push({d:new Date().toISOString().slice(0,10),t:tp,s:score,n:list.length});S.hist=S.hist.slice(-30);save();showHist()}
+markToday();
+};
+btns.push(b);d.appendChild(b);
+});
+d.appendChild(why);box.appendChild(d);
+});
+}
+$('#modeS').onclick=function(){S.par=false;applyLook();save()};
+$('#modeP').onclick=function(){S.par=true;applyLook();save()};
+$('#age').onchange=function(){S.age=this.value;save()};
+var VIEWS=['Study','Progress','Help','Settings'];
+function view(n){VIEWS.forEach(function(v){$('#view'+v).hidden=(v!==n);var b=$('#nav'+v);if(v===n)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});window.scrollTo(0,0)}
+VIEWS.forEach(function(v){$('#nav'+v).onclick=function(){view(v)}});
+var TABS=['plan','timerCard','learn'];
+function tab(n){TABS.forEach(function(id,i){$('#'+id).hidden=(i!==n);$('#tab'+i).setAttribute('aria-selected',i===n)});window.scrollTo(0,0)}
+[0,1,2].forEach(function(i){$('#tab'+i).onclick=function(){tab(i)}});
+$('#nx0').onclick=function(){tab(1)};
+$('#nx1').onclick=function(){tab(2)};
+function showWork(){$('#setup').hidden=true;$('#work').hidden=false;tab(0)}
+$('#back').onclick=function(){clearInterval(tid);tid=null;$('#go').textContent='Start';$('#work').hidden=true;$('#setup').hidden=false;window.scrollTo(0,0)};
+if(!S.did){S.did=Math.random().toString(36).slice(2)+Date.now().toString(36);save()}
+var TG=(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData)?Telegram.WebApp:null;
+if(TG){
+try{TG.ready();TG.expand()}catch(e){}
+try{TG.CloudStorage.getItem('tinystart',function(err,val){
+if(err||!val)return;
+try{var c=JSON.parse(val);
+if(c.hist&&c.hist.length>=S.hist.length)S.hist=c.hist;
+if(c.days&&c.days.length>=S.days.length)S.days=c.days;
+if(c.ai&&c.ai.d===today()&&(!S.ai||S.ai.d!==today()||c.ai.n>S.ai.n))S.ai=c.ai;
+['size','dys','hc','par','age','lim'].forEach(function(k){if(c[k]!==undefined)S[k]=c[k]});
+applyLook()}catch(e){}
+})}catch(e){}
+}
+applyLook();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js')})}
+</script>
+</body>
+</html>
