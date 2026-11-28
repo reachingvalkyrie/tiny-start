@@ -1,4 +1,4 @@
--<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -358,6 +358,22 @@ yes.onclick=function(){known++;i++;draw()};
 no.onclick=function(){i++;draw()};
 draw();
 }
+function whoQ(){
+if(S.par){var a={young:'5 to 7',mid:'8 to 11',old:'12 and up'}[S.age];return 'a child aged '+a+', worded so a parent can read each question aloud.'}
+return 'a teenager at this level: '+$('#level').value+'.'
+}
+function parseQuiz(t){
+var items=[],cur=null,m;
+String(t).replace(/\r/g,'').split('\n').forEach(function(line){
+line=line.replace(/\*\*/g,'').trim();
+if(m=line.match(/^(?:Q(?:uestion)?\s*\d*|\d+)\s*[:.)]\s*(.+)$/i)){cur={q:m[1],options:[],answer:-1,why:''};items.push(cur);return}
+if(!cur)return;
+if(m=line.match(/^([A-D])\s*[).:]\s*(.+)$/i)){cur.options.push(m[2]);return}
+if(m=line.match(/^(?:correct\s*)?answer\s*[:\-]?\s*\(?([A-D])\b/i)){cur.answer=m[1].toUpperCase().charCodeAt(0)-65;return}
+if(m=line.match(/^(?:why|explanation)\s*[:\-]\s*(.+)$/i)){cur.why=m[1]}
+});
+return items.filter(function(x){return x.options.length===4&&x.answer>=0&&x.answer<4});
+}
 async function ask(input,json,onText){
 var r;
 try{r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:input,did:S.did})})}catch(e){throw {code:'none'}}
@@ -375,6 +391,7 @@ return 'a teenager at this level: '+$('#level').value+'.'
 }
 function fail(e){
 done();var c=e&&e.code;
+if(c==='format'){$('#ai').textContent='The AI’s questions came out garbled. Please press the button again, or try a shorter topic.';return}
 if(c==='daily'){$('#ai').textContent='The daily AI limit has been reached. Notes questions are still unlimited. Come back tomorrow!';return}
 $('#ai').textContent=(c==='none'||c==='not_granted')?'AI help isn’t switched on yet. The steps and timer still work.':(c==='rate_limited'?'Too many requests. Wait a minute and try again.':'Something went wrong. Please try again.');
 }
@@ -391,9 +408,10 @@ $('#quiz').onclick=async function(){
 var t=topicOr();if(!t)return;if(!canUse())return;
 $('#ai').textContent='Making questions…';$('#qs').textContent='';
 try{
-var r=await ask('Write 5 multiple-choice practice questions on "'+t+'" for '+who()+' Return only JSON: an array of 5 objects, each {"q":string,"options":[4 strings],"answer":number 0-3,"why":one short sentence}. Make them accurate.',true);
-var list=Array.isArray(r)?r:((r&&r.questions)||[]);
-if(!list.length)throw {code:'bad'};
+var prompt='Write 5 multiple-choice practice questions about "'+t+'" for '+whoQ()+' Use exactly this format for every question, with a blank line between questions and no other text:\nQ1: question text\nA) option\nB) option\nC) option\nD) option\nAnswer: B\nWhy: one short sentence\nMake the questions accurate and the answer letters varied.';
+var list=[];
+for(var n=0;n<2&&!list.length;n++){var r=await ask(prompt,false);list=parseQuiz(r.text)}
+if(!list.length)throw {code:'format'};
 renderQuiz(list);useOne();$('#ai').textContent='Pick an answer for each question. AI can make mistakes, so double-check with your teacher.';
 }catch(e){fail(e)}
 };
