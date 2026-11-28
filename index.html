@@ -315,10 +315,10 @@ return cards;
 }
 
 function today(){return new Date().toISOString().slice(0,10)}
-function left(){return Math.max(0,(S.lim||5)-((S.ai&&S.ai.d===today())?S.ai.n:0))}
-function showLeft(){$('#left').textContent=left()+' of '+(S.lim||5)+' AI helps left today'}
+function aiLeft(){return Math.max(0,(S.lim||5)-((S.ai&&S.ai.d===today())?S.ai.n:0))}
+function showLeft(){$('#left').textContent=aiLeft()+' of '+(S.lim||5)+' AI helps left today'}
 function canUse(){
-if(left()<1){$('#ai').textContent='You’ve used today’s '+(S.lim||5)+' AI helps. Notes questions are still unlimited. Come back tomorrow!';return false}
+if(aiLeft()<1){$('#ai').textContent='You’ve used today’s '+(S.lim||5)+' AI helps. Notes questions are still unlimited. Come back tomorrow!';return false}
 $('#explain').disabled=true;$('#quiz').disabled=true;return true;
 }
 function done(){$('#explain').disabled=false;$('#quiz').disabled=false}
